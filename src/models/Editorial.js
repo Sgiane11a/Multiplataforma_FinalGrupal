@@ -26,20 +26,17 @@ const editorialSchema = new mongoose.Schema({
     min: [1000, 'Año de fundación no válido'],
     max: [new Date().getFullYear(), 'El año no puede ser futuro']
   },
-  sitioWeb: {
+  direccion: {
     type: String,
+    required: [true, 'La dirección es obligatoria'],
     trim: true,
-    match: [/^https?:\/\/.+/, 'Por favor ingrese una URL válida']
+    maxLength: [200, 'La dirección no puede exceder 200 caracteres']
   },
-  telefono: {
+  contacto: {
     type: String,
-    trim: true
-  },
-  email: {
-    type: String,
+    required: [true, 'El contacto es obligatorio'],
     trim: true,
-    lowercase: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Por favor ingrese un email válido']
+    maxLength: [100, 'El contacto no puede exceder 100 caracteres']
   }
 }, {
   timestamps: true

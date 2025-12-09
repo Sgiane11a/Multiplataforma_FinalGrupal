@@ -24,8 +24,10 @@ const libroSchema = new mongoose.Schema({
     trim: true
   },
   fechaPublicacion: {
-    type: Date,
-    required: [true, 'La fecha de publicación es obligatoria']
+    type: Number,
+    required: [true, 'El año de publicación es obligatorio'],
+    min: [1000, 'El año debe ser válido'],
+    max: [new Date().getFullYear(), 'El año no puede ser futuro']
   },
   genero: {
     type: String,
@@ -52,19 +54,14 @@ const libroSchema = new mongoose.Schema({
   disponible: {
     type: Boolean,
     default: true
+  },
+  descripcion: {
+    type: String,
+    trim: true,
+    maxLength: [1000, 'La descripción no puede exceder 1000 caracteres']
   }
 }, {
   timestamps: true
-});
-
-// Middleware para actualizar disponibilidad basada en stock
-libroSchema.pre('save', function(next) {
-  if (this.stock === 0) {
-    this.disponible = false;
-  } else if (this.stock > 0) {
-    this.disponible = true;
-  }
-  next();
 });
 
 // Índices para optimizar búsquedas

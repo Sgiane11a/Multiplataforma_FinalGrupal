@@ -3,8 +3,13 @@ const errorHandler = (err, req, res, next) => {
   let error = { ...err };
   error.message = err.message;
 
-  // Log del error
-  console.error(err);
+  // Log detallado del error
+  console.error('🚨 Error capturado:', {
+    name: err.name,
+    message: err.message,
+    stack: err.stack,
+    code: err.code
+  });
 
   // Error de mongoose - ID mal formateado
   if (err.name === 'CastError') {
@@ -24,9 +29,16 @@ const errorHandler = (err, req, res, next) => {
     error = { message, statusCode: 400 };
   }
 
-  res.status(error.statusCode || 500).json({
+  // Error genérico
+  if (!error.statusCode) {
+    error.statusCode = 500;
+    error.message = error.message || 'Error interno del servidor';
+  }
+
+  res.status(error.statusCode).json({
     success: false,
-    error: error.message || 'Error del servidor'
+    message: error.message,
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 };
 

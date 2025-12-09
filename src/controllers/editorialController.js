@@ -31,6 +31,11 @@ const getEditoriales = async (req, res) => {
       .skip(startIndex)
       .exec();
 
+    console.log('🏢 Editoriales encontradas:', editoriales.length);
+    if (editoriales.length > 0) {
+      console.log('📖 Ejemplo de editorial:', JSON.stringify(editoriales[0], null, 2));
+    }
+
     res.status(200).json({
       success: true,
       count: editoriales.length,

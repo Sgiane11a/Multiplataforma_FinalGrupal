@@ -37,6 +37,11 @@ const getLibros = async (req, res) => {
       .skip(startIndex)
       .exec();
 
+    console.log('📚 Libros encontrados:', libros.length);
+    if (libros.length > 0) {
+      console.log('📖 Ejemplo de libro:', JSON.stringify(libros[0], null, 2));
+    }
+
     res.status(200).json({
       success: true,
       count: libros.length,
@@ -93,7 +98,30 @@ const getLibro = async (req, res) => {
 // @access  Public
 const createLibro = async (req, res) => {
   try {
-    const libro = await Libro.create(req.body);
+    console.log('📝 Datos recibidos para crear libro:', req.body);
+    
+    // Validar que los campos requeridos estén presentes
+    const { titulo, autor, editorial, isbn, fechaPublicacion, genero, numeroPaginas, precio } = req.body;
+    
+    if (!titulo || !autor || !editorial || !isbn || !fechaPublicacion || !genero || !numeroPaginas || !precio) {
+      return res.status(400).json({
+        success: false,
+        message: 'Faltan campos requeridos',
+        campos_requeridos: ['titulo', 'autor', 'editorial', 'isbn', 'fechaPublicacion', 'genero', 'numeroPaginas', 'precio']
+      });
+    }
+
+    // Asegurar que el stock tenga un valor por defecto si no se proporciona
+    const libroData = {
+      ...req.body,
+      stock: req.body.stock || 1
+    };
+
+    console.log('📝 Datos a guardar:', libroData);
+    
+    const libro = await Libro.create(libroData);
+
+    console.log('✅ Libro creado exitosamente:', libro._id);
 
     res.status(201).json({
       success: true,
@@ -101,6 +129,8 @@ const createLibro = async (req, res) => {
       data: libro
     });
   } catch (error) {
+    console.error('❌ Error al crear libro:', error);
+    
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(val => val.message);
       
